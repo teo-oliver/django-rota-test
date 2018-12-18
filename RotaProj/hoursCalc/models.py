@@ -3,30 +3,6 @@ import datetime
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User # PermissionsMixin
 
-#Todo: Start working on Forms (rewatch the udemy tutorials)
-
-# Name Ideia: WorkIntheDjango
-
-# Todo: change FloatField to DecimalField (duration-> set precision to 2 or rounding=ROUND_DOWN)
-# https://docs.python.org/3/library/decimal.html#module-decimal
-
-# Todo: SuperUser to the Manager (so only him/her can edit the spreadsheet)
-
-# Todo: Total Week hour, Total Month Hours(view: from cut-off date to date) 
-
-# Make a static folder for CSS and js scripts
-
-# Make a html file, that loops dateTime objects, to create a calendar, that, check if theres a match between the name row and date column display on the "calendar field"
-# https://www.w3schools.com/howto/howto_css_calendar.asp
-
-
-# related_name on ForeignKey to use the _set, if not it will be the class name _set, for ex for Hours Day would be hoursday_set, from there you can use hoursday_set.all
-
-# class User(User, PermissionsMixin)
-
-#     def __str__(self):
-#         return self.username
-
 
 class Shift(models.Model):
     name = models.ForeignKey(User,on_delete=models.CASCADE)
