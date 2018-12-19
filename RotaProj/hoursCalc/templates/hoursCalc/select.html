@@ -21,7 +21,7 @@
         <div class="jumbotron">
 
             <form action={% url 'select' %} method="POST">
-                {{ selec_date_form.as_p}}
+                {{ select_date_form.as_p}}
                 {% csrf_token %}
             <input type="submit" class="btn btn-outline-danger btn-sm" value="Select">
             </form>
@@ -31,27 +31,25 @@
     </div>
 
     <div class="container">  
-        {% for user in users %}
+    {% regroup shifts by name as user_list %}
+
+        {% for user in user_list %}
             <div class="row">
-                <div class="col-md-2"> <strong>{{user.username}}</strong> </div>
+                <div class="col-md-2"> <strong>{{ user.grouper.username }}</strong> </div>
                 <div class="col-md-2"> <strong> In/Out </strong> </div>
                 <div class="col-md-2"> <strong> Break </strong>  </div>
                 <div class="col-md-3"> <strong> Total </strong>  </div>
                 <div class="col-md-3"> </div>
             </div>
-            
-            <hr> 
-            {% for i in user.shift_set.all %}  {# user.hoursday_set.filter(date__gte=df).filter(date__lte=dt) #}
-
+            <hr>
+            {% for shift in user.list %}
                 <div class="row">
-                    <div class="col-md-2"> {{ i.date|date:"d/m/y" }} </div>
-                    <div class="col-md-2"> {{ i.clock_in|date:"H:i" }} - {{ i.clock_out|date:"H:i"}} </div>
-                    <div class="col-md-2"> {{ i.break_time}} </div>
-                    <div class="col-md-3"> {{i.duration}}h </div>
-                    <div class="col-md-3"> <a class="btn btn-outline-danger btn-sm" href="{% url 'remove' pk=i.id %}">Remove</a> </div>
+                    <div class="col-md-2"> {{ shift.date|date:"d/m/y" }} </div>
+                    <div class="col-md-2"> {{ shift.clock_in|date:"H:i" }} - {{ shift.clock_out|date:"H:i" }} </div>
+                    <div class="col-md-2"> {{ shift.break_time }} </div>
+                    <div class="col-md-3"> {{ shift.duration }}h </div>
                 </div>
-                <hr>    
-
+                <hr>
             {% endfor %}
 
             <div class="row">
@@ -67,5 +65,15 @@
         
     </div>
 </div>
+
+
+<div class="jumbotron">
+    {% for i in user_shifts %}
+    <br>
+    <h1> {{i.shift_set.all}}</h1>
+    <br>
+    {% endfor %}
+</div>
+
 </body>
 </html>

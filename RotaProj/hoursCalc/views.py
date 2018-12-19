@@ -59,46 +59,40 @@ def remove(request, pk):
 def selectDate(request):
 
     users = User.objects.all()
-    selec_date_form = forms.SelectDateForm()
+    select_date_form = forms.SelectDateForm()
 
     objects = []
+    shifts = []
     # user_objects_list = []
 
-    # dt="2000-01-01"
-    # df="2000-01-01"
+    dt="2000-01-01"
+    df="2000-01-01"
 
     if request.method == 'POST':
-        selec_date_form = forms.SelectDateForm(request.POST)
+        select_date_form = forms.SelectDateForm(request.POST)
 
-        if selec_date_form.is_valid():
+        if select_date_form.is_valid():
 
             print("VALIDATION SUCCESS!")
-            print("date_from: ", selec_date_form.cleaned_data['date_from'])
-            print("date_to: ", selec_date_form.cleaned_data['date_to'])
+            print("date_from: ", select_date_form.cleaned_data['date_from'])
+            print("date_to: ", select_date_form.cleaned_data['date_to'])
 
-            df = selec_date_form.cleaned_data['date_from']
-            dt = selec_date_form.cleaned_data['date_to']
+            df = select_date_form.cleaned_data['date_from']
+            dt = select_date_form.cleaned_data['date_to']
             
-            objects = Shift.objects.all().filter(date__gte=df).filter(date__lte=dt) #.order_by('date')
-
-            print( users[0].shift_set.filter(date__gte=df).filter(date__lte=dt), users[1].shift_set.filter(date__gte=df).filter(date__lte=dt)  )
-
-    # for user in users:
-    #     x = user.Shift_set.filter(date__gte=df).filter(date__lte=dt)
-    #     user_objects_list.append
-
+            shifts = Shift.objects.select_related('name').filter(date__gte=df, date__lte=dt).order_by('name')
 
     total_hours = 0
-    for i in objects:
+    for i in shifts:
         total_hours = total_hours + i.duration
 
 
     context = {
-        'selec_date_form': selec_date_form,
+        'select_date_form': select_date_form,
         'users': users,
         'objects':objects,
         'total_hours':total_hours,
-        # 'user_objects_list':user_objects_list
+        'shifts':shifts
     }
 
     return render(request, 'hoursCalc/select.html', context)
@@ -107,7 +101,7 @@ def selectDate(request):
 def select_periods(request, date_from, date_to):
 
     users = User.objects.all()
-    objects = Shift.objects.all().filter(date__gte=date_from).filter(date__lte=date_to) #.order_by('date')
+    objects = Shift.objects.filter(date__gte=date_from).filter(date__lte=date_to)
 
     total_hours = 0
     for i in objects:
