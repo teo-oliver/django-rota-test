@@ -33,13 +33,14 @@
     <div class="container">  
     {% regroup shifts by name as user_list %}
 
+   
         {% for user in user_list %}
             <div class="row">
                 <div class="col-md-2"> <strong>{{ user.grouper.username }}</strong> </div>
                 <div class="col-md-2"> <strong> In/Out </strong> </div>
                 <div class="col-md-2"> <strong> Break </strong>  </div>
-                <div class="col-md-3"> <strong> Total </strong>  </div>
-                <div class="col-md-3"> </div>
+                <div class="col-md-3"> <strong> Hours </strong>  </div>
+                <div class="col-md-3"> {{shifts.total_duration}}  </div>
             </div>
             <hr>
             {% for shift in user.list %}
@@ -51,28 +52,36 @@
                 </div>
                 <hr>
             {% endfor %}
-
+            
             <div class="row">
                 <div class="col-md-2"> </div>
                 <div class="col-md-2"> </div>
                 <div class="col-md-2"> </div>
-                <div class="col-md-3"> <strong>Total: </strong>  {{total_hours}}  </div>
+                <div class="col-md-3"> <strong>Total:</strong> {{i.total_duration}} </div>
                 <div class="col-md-3"> </div>
+                
             </div>
             <hr>
             
         {% endfor %} 
-        
+    
+
     </div>
 </div>
 
 
 <div class="jumbotron">
-    {% for i in user_shifts %}
-    <br>
-    <h1> {{i.shift_set.all}}</h1>
-    <br>
+    {{total_user_hours}}
+    {% for i in total_user_hours %}
+    {{i}}
+    {{i.total_duration}}
     {% endfor %}
+
+
+
+
+   
+
 </div>
 
 </body>

@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from . import forms
 from .models import Shift
 
+from django.db.models import Sum, Count
+
 def index(request):
 
     objects_id = list(Shift.objects.all().values_list('id', flat=True))
@@ -60,10 +62,10 @@ def selectDate(request):
 
     users = User.objects.all()
     select_date_form = forms.SelectDateForm()
-
+    total_user_hours = User.objects.annotate(total_duration=Sum('shift__duration'))
+    
     objects = []
     shifts = []
-    # user_objects_list = []
 
     dt="2000-01-01"
     df="2000-01-01"
@@ -82,16 +84,12 @@ def selectDate(request):
             
             shifts = Shift.objects.select_related('name').filter(date__gte=df, date__lte=dt).order_by('name')
 
-    total_hours = 0
-    for i in shifts:
-        total_hours = total_hours + i.duration
-
-
+    
     context = {
         'select_date_form': select_date_form,
         'users': users,
         'objects':objects,
-        'total_hours':total_hours,
+        'total_user_hours':total_user_hours,
         'shifts':shifts
     }
 
