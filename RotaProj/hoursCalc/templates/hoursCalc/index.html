@@ -1,71 +1,32 @@
-<!DOCTYPE html>
+{% extends './base.html' %}
+{% load crispy_forms_tags %}
 
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+{% block content %}
 
-    <!-- BootstrapCDN - CSS only -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-
-    <title>Document</title>
-</head>
-<body>
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-        <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Create_User</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Add_Shift</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link disabled" href="#">Disabled</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link disabled" href="#">Logic</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link disabled" href="#">Sign_Up</a>
-        </li>
-        </ul>
-    </div>
-</nav>
-
-<div class="container">
+<div class="container mb-4">
     <h1 class="display-3"><center>Django Rota</center></h1>
 </div>
  
 <div class="container">
-    <div class="jumbotron">
-        <form action="{% url 'submit' %}" method="POST">
-            {{ form.as_p }}
-            {% csrf_token %}
-            <input type="submit" class="btn btn-primary" value="Submit">
-        </form>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
-</div>
 
 <div class="container">
 <div class="row">
     
-    <div class="col-md-4 bg-light">
+    <!-- <div class="col-md-4 bg-light">
 
         <div class="container">
             <center>
                 <p> <strong>Pay Periods:</strong> </p>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 11-Mar-18 -> Sat 07-Apr-18</a><br>
                 <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 08-Apr-18 -> Sat 05-May-18</a><br>
+                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 11-Mar-18 -> Sat 07-Apr-18</a><br>
                 <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 06-May-18 -> Sat 02-Jun-18</a><br>
                 <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 03-Jun-18 -> Sat 30-Jun-18</a><br>
                 <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 01-Jul-18 -> Sat 28-Jul-18</a><br>
@@ -77,38 +38,40 @@
                 <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 16-Dec-18 -> Sat 12-Jan-19</a><br>
                 <a href="{% url 'select' date_from='2019-01-13' date_to='2019-02-09' %}">Sun 13-Jan-19 -> Sat 09-Feb-19</a><br>
                 <a href="{% url 'select' date_from='2019-02-19' date_to='2019-03-19' %}">Sun 10-Feb-19 -> Sat 09-Mar-19</a><br>
-                <br>
-                <a href="{% url 'select' %}"> Go to SELECT dates</a>
             </center>
         </div>
         
-    </div>
+    </div> -->
         
-    <div class="col-md-8">
-        {% load shifts %}
+    <!-- <div class="col-md-8"> -->
+        {% load shifts %} {# custom tag #}
          
         <div class="container">  
             {% for user in users %}
-                <div class="row">
-                    <div class="col-md-2"> <strong>{{user.username}}</strong> </div>
+            {% if user.shift_set.count > 0 %}
+                <div class="row">   {# this could be a nav that stick intil the next one? #}
+                    <div class="col-md-2"> 
+                       {# <img class="rounder-circle" src="{{ user.profile.image.url}}" alt="">#}   
+                       <strong>{{user.username}}</strong> 
+                    </div>
                     <div class="col-md-2"> <strong> In/Out </strong> </div>
                     <div class="col-md-2"> <strong> Break </strong>  </div>
-                    <div class="col-md-3"> <strong> Total </strong>  </div>
+                    <div class="col-md-3"> <strong> Hours </strong>  </div>
                     <div class="col-md-3"> </div>
                 </div>
-                
                 <hr> 
                 {% for i in user.shift_set.all %}
-
                     <div class="row">
                         <div class="col-md-2"> {{ i.date|date:"d/m/y" }} </div>
                         <div class="col-md-2"> {{ i.clock_in|date:"H:i" }} - {{ i.clock_out|date:"H:i"}} </div>
                         <div class="col-md-2"> {{ i.break_time}} </div>
                         <div class="col-md-3"> {{i.duration}}h </div>
-                        <div class="col-md-3"> <a class="btn btn-outline-danger btn-sm" href="{% url 'remove' pk=i.id %}">Remove</a> </div>
+                        <div class="col-md-1"> <a class="btn btn-outline-info btn-sm" href="{% url 'detail' pk=i.id %}">Detail</a> </div>
+                        <div class="col-md-1"> <a class="btn btn-outline-info btn-sm" href="{% url 'edit' pk=i.id %}">Edit</a> </div>
+                        <div class="col-md-1"> <a class="btn btn-outline-danger btn-sm" href="{% url 'remove' pk=i.id %}">Remove</a> </div>
                     </div>
                     <hr>    
-
+           
                 {% endfor %}
 
                 <div class="row">
@@ -123,24 +86,37 @@
                     <div class="col-md-3"> </div>
                 </div>
                 <hr>
-                
+            {% else %}
+            {% endif %}
             {% endfor %} 
         
         </div>
-    </div>
+    <!-- </div> -->
 </div>
+
+    <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Filter</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                <form action="{% url 'submit' %}" method="POST">
+                    {{ form|crispy  }}
+                    {% csrf_token %}
+                    <hr>
+                    <input type="submit" class="btn btn-primary" value="Submit">
+                    {#<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>#}
+                </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>      
 
-<div class="jumbotron">
-    {{ create_user_form.as_p }}
-</div>
-
-
-<footer>
-    <div class="container jumbotron">
-        <h6><center> Created by Teo Oliver - Django/Boostrap </center>  </h3>
-    </div>
-</footer>
-
-</body>
-</html>
+{% endblock content %}

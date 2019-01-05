@@ -6,15 +6,18 @@ from django.contrib.auth.models import User # PermissionsMixin
 
 class Shift(models.Model):
     name = models.ForeignKey(User,on_delete=models.CASCADE)
-    clock_in = models.DateTimeField(blank=True, null=True)
-    clock_out = models.DateTimeField(blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
+    clock_in = models.DateTimeField(blank=True, null=True) #not blanck or null
+    clock_out = models.DateTimeField(blank=True, null=True)  #not blanck or null
+    date = models.DateField(blank=True, null=True) #not blanck or null
     duration  = models.FloatField(default=0)
     break_time = models.DurationField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True, max_length=600)
 
     class Meta:
         ordering = ['date']
 
+
+    #this should became a save method, so I can take the logic out of the views
     def time_diff(self):
         if self.clock_out and self.clock_in:
             self.duration = (self.clock_out - self.clock_in).seconds/60/60
@@ -23,31 +26,12 @@ class Shift(models.Model):
                 self.duration = round(self.duration, 1)
             self.save()      
         else:
+            # self.duration = 0 (aready default on the field attr)
             return
 
     def __str__(self):
         return str(self.name)
 
-
-class Week(models.Model):
-    week = models.CharField(max_length=150, blank=True, null=True)
-    month = models.ForeignKey('Month',on_delete=models.CASCADE)
-    week_hours = models.FloatField(default=0)
-
-    def __str__(self):
-        return str(self.week)
-    
-
-class Month(models.Model):
-    name = models.ForeignKey(User,on_delete=models.CASCADE)
-    month_name = models.CharField(max_length=150, blank=True, null=True)
-    month_hours = models.FloatField(default=0)
-
-    def __str__(self):
-        return str(self.month_name)
-
-    def total_month_hours(self):
-        pass
-
+    # def get_absolute_url
 
      
