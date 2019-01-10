@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 
@@ -8,8 +10,7 @@ from django.contrib.auth.decorators import login_required
 from . import forms
 from .models import Shift
 
-from django.db.models import Sum, Count
-
+# from django.db.models import Sum, Count
 
 def initial_page(request):
     return render(request, 'hoursCalc/initial_page.html')
@@ -18,13 +19,6 @@ def initial_page(request):
 @login_required
 def index(request):
 
-    # Calculate Interval and Save (todo: make it automatic outside the view on the models.py file)
-    objects_id = list(Shift.objects.all().values_list('id', flat=True))
-    for id in objects_id:
-        ShiftObject = get_object_or_404(Shift, id=id)
-        ShiftObject.time_diff()
-    #####################################################################
-
     users = User.objects.all()
     form = forms.ClockInOutForm()
     shift = Shift.objects.all()
@@ -32,7 +26,8 @@ def index(request):
     context = {
         'shift': shift,
         'users': users,
-        'form':form,      
+        'form': form,
+        'title': 'Home'
     }
 
     return render(request, 'hoursCalc/index.html', context)
@@ -49,13 +44,16 @@ def submitForm(request): #change to create_shift
             new_clock_in = str(form.cleaned_data['date'])+ ' ' + str(form.cleaned_data['clock_in'])  
             new_clock_out = str(form.cleaned_data['date'])+ ' ' + str(form.cleaned_data['clock_out'])
 
-            Shift.objects.create(name=form.cleaned_data['name'], 
-                                    clock_in=new_clock_in, 
-                                    clock_out=new_clock_out,
-                                    break_time = form.cleaned_data['break_time'],
-                                    date=form.cleaned_data['date'],
-                                    description=form.cleaned_data['description'] )
-            
+            clock_in_new = datetime.strptime(new_clock_in, '%Y-%d-%m %H:%M:%S'  )
+            clock_out_new = datetime.strptime(new_clock_out, '%Y-%d-%m %H:%M:%S')
+
+            Shift.objects.create(name=form.cleaned_data['name'],
+                                 clock_in=clock_in_new,
+                                 clock_out=clock_out_new,
+                                 break_time=form.cleaned_data['break_time'],
+                                 date=form.cleaned_data['date'],
+                                 description=form.cleaned_data['description'])
+        
     return redirect(index)
 
 
@@ -88,11 +86,10 @@ def selectDate(request, dt="2000-01-01", df="2000-01-01" ): # juntar selectDate 
             
             shifts = Shift.objects.select_related('name').filter(date__gte=df, date__lte=dt).order_by('name')
 
-
     context = {
         'select_date_form': select_date_form,
         'users': users,
-        'shifts':shifts,
+        'shifts': shifts,
         'title': 'Select Dates'
     }
 
@@ -101,21 +98,20 @@ def selectDate(request, dt="2000-01-01", df="2000-01-01" ): # juntar selectDate 
     
 @login_required
 def select_periods(request, date_from, date_to): #do it so this function is not needed, change to filter
-
     users = User.objects.all()
     objects = Shift.objects.filter(date__gte=date_from).filter(date__lte=date_to)
 
     context = {
         'users': users,
-        'objects':objects,
-        
+        'objects': objects,
+        'title': 'Select Period'
     }
-    
+
     return render(request, 'hoursCalc/select.html', context)
 
 
 @login_required
-def update_shift(request, pk): #needs more work on this one
+def update_shift(request, pk): #needs more work on this one (make it so I don't need a update, only a create shift)
     
     shift_to_update = get_object_or_404(Shift, pk=pk)
    
@@ -127,53 +123,38 @@ def update_shift(request, pk): #needs more work on this one
             new_clock_in = str(shift_form.cleaned_data['date'])+ ' ' + str(shift_form.cleaned_data['clock_in'])  
             new_clock_out = str(shift_form.cleaned_data['date'])+ ' ' + str(shift_form.cleaned_data['clock_out'])
 
-            shift_to_update.clock_in=new_clock_in    
-            shift_to_update.clock_out=new_clock_out
+            clock_in_new = datetime.strptime(new_clock_in, '%Y-%d-%m %H:%M:%S'  )
+            clock_out_new = datetime.strptime(new_clock_out, '%Y-%d-%m %H:%M:%S')
+
+            shift_to_update.clock_in = clock_in_new
+            shift_to_update.clock_out = clock_out_new
             shift_to_update.break_time = shift_form.cleaned_data['break_time']
-            shift_to_update.date=shift_form.cleaned_data['date']
-                                             
+            shift_to_update.date = shift_form.cleaned_data['date']
+
             shift_to_update.save()
-                                    
+
             messages.success(request, f'Your shift has been updated!')
-            
-            return redirect(index)    
+
+            return redirect(index)
 
     else:
-        shift_form = forms.ShiftUpdateForm(initial={'clock_in':shift_to_update.clock_in,
-                                                    'clock_out':shift_to_update.clock_out,
-                                                   'date':shift_to_update.date,
-                                                    'duration':shift_to_update.duration,
-                                                    'break_time':shift_to_update.break_time,
-                                                    'description':shift_to_update.description,                                                
-        })
-
+        shift_form = forms.ShiftUpdateForm(initial={'clock_in': shift_to_update.clock_in,
+                                                    'clock_out': shift_to_update.clock_out,
+                                                    'date': shift_to_update.date,
+                                                    'duration': shift_to_update.duration,
+                                                    'break_time': shift_to_update.break_time,
+                                                    'description': shift_to_update.description,
+                                                    })
 
     context = {
-        'shift_form':shift_form,
-        # 'messages':messages
+        'shift_form': shift_form,
+        'title': 'Update Shift'
     }
 
     return render(request, 'hoursCalc/update_shift.html', context)
 
 
-
 def shift_detail(request, pk):
     shift = get_object_or_404(Shift, pk=pk)
-    return render(request, 'hoursCalc/shift_detail.html', {'shift':shift})
+    return render(request, 'hoursCalc/shift_detail.html', {'shift': shift})
 
-
-
-
-
-
-
- # if request.method == 'POST':
-    #     shift_form = forms.ClockInOutForm(request.POST, instance=request.shift)
-                          
-    #     if shift_form.is_valid():
-    #         shift_form.save()
-    #         messages.success(request, f'Your shift has been updated!')
-    #         return redirect('index')
-
-    # else:
-    #     shift_form = forms.ClockInOutForm(instance=request.shift)

@@ -1,0 +1,36 @@
+{% extends 'hoursCalc/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<h1 class="display-2"> <center>Todo List</center> </h1>
+
+<div class="container">
+  <form action="{% url 'todo_submit' %}" method="POST">
+    {% csrf_token %}
+    <fieldset class="form-group">
+      <legend class="border-botton">Create/Update Todo Item</legend>
+      <hr>
+      {{ todo_form|crispy }}
+    </fieldset>
+    <div class="form-group">
+      <button class="btn btn-outline-info" type="submit" >Create</button>
+      <a class="btn btn-outline-info" href="{% url 'delete_complete' %}"> Delete Completed </a>
+      <a class="btn btn-outline-info" href="{% url 'delete_all' %}"> Delete All </a>
+    </div>
+    <hr class="mb-2">
+  </form>
+</div>
+
+
+  {% for todo in todos %}
+    <ul class="mb-3">
+      {% if todo.done %}
+        <li class="ml-2 backgroud-dark "><h2><strike>{{ todo.text }}</strike></h2></li>
+      {% else %}
+        <a href="{% url 'complete_todo' pk=todo.id %}"><li class="display-5 ml-2"><h2>{{ todo.text }}</h2></li></a>
+      {% endif %}
+    </ul>
+  {% endfor %}
+
+{% endblock content %}

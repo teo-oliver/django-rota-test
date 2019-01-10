@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'hoursCalc.apps.HourscalcConfig',
     'users.apps.UsersConfig',
-    'crispy_forms' ,
+    'blog.apps.BlogConfig',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [

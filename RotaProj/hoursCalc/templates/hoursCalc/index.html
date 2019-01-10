@@ -4,7 +4,8 @@
 {% block content %}
 
 <div class="container mb-4">
-    <h1 class="display-3"><center>Django Rota</center></h1>
+    <h1 class="display-3"><center>Shifts</center></h1>
+    <button type="button" class="btn btn-info btn-lg btn-block" data-toggle="modal" data-target="#filterModal" >Add New Shift</button>
 </div>
  
 <div class="container">
@@ -18,81 +19,55 @@
     </div>
 
 <div class="container">
-<div class="row">
     
-    <!-- <div class="col-md-4 bg-light">
-
-        <div class="container">
-            <center>
-                <p> <strong>Pay Periods:</strong> </p>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 08-Apr-18 -> Sat 05-May-18</a><br>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 11-Mar-18 -> Sat 07-Apr-18</a><br>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 06-May-18 -> Sat 02-Jun-18</a><br>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 03-Jun-18 -> Sat 30-Jun-18</a><br>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 01-Jul-18 -> Sat 28-Jul-18</a><br>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 29-Jul-18 -> Sat 25-Aug-18</a><br>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 26-Aug-18 -> Sat 22-Sep-18</a><br>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 23-Sep-18 -> Sat 20-Oct-18</a><br>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 21-Oct-18 -> Sat 17-Nov-18</a><br>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 18-Nov-18 -> Sat 15-Dec-18</a><br>
-                <a href="{% url 'select' date_from='2018-03-11' date_to='2018-04-07' %}">Sun 16-Dec-18 -> Sat 12-Jan-19</a><br>
-                <a href="{% url 'select' date_from='2019-01-13' date_to='2019-02-09' %}">Sun 13-Jan-19 -> Sat 09-Feb-19</a><br>
-                <a href="{% url 'select' date_from='2019-02-19' date_to='2019-03-19' %}">Sun 10-Feb-19 -> Sat 09-Mar-19</a><br>
-            </center>
-        </div>
+    {% load shifts %} {# custom tag #}
         
-    </div> -->
-        
-    <!-- <div class="col-md-8"> -->
-        {% load shifts %} {# custom tag #}
-         
-        <div class="container">  
-            {% for user in users %}
-            {% if user.shift_set.count > 0 %}
-                <div class="row">   {# this could be a nav that stick intil the next one? #}
-                    <div class="col-md-2"> 
-                       {# <img class="rounder-circle" src="{{ user.profile.image.url}}" alt="">#}   
-                       <strong>{{user.username}}</strong> 
-                    </div>
-                    <div class="col-md-2"> <strong> In/Out </strong> </div>
-                    <div class="col-md-2"> <strong> Break </strong>  </div>
-                    <div class="col-md-3"> <strong> Hours </strong>  </div>
-                    <div class="col-md-3"> </div>
+    <div class="container">  
+        {% for user in users %}
+        {% if user.shift_set.count > 0 %}
+            <div class="row">   {# this could be a nav that stick intil the next one? #}
+                <div class="col-md-2"> 
+                    {# <img class="rounder-circle" src="{{ user.profile.image.url}}" alt="">#}   
+                    <strong>{{user.username}}</strong> 
                 </div>
-                <hr> 
-                {% for i in user.shift_set.all %}
-                    <div class="row">
-                        <div class="col-md-2"> {{ i.date|date:"d/m/y" }} </div>
-                        <div class="col-md-2"> {{ i.clock_in|date:"H:i" }} - {{ i.clock_out|date:"H:i"}} </div>
-                        <div class="col-md-2"> {{ i.break_time}} </div>
-                        <div class="col-md-3"> {{i.duration}}h </div>
-                        <div class="col-md-1"> <a class="btn btn-outline-info btn-sm" href="{% url 'detail' pk=i.id %}">Detail</a> </div>
-                        <div class="col-md-1"> <a class="btn btn-outline-info btn-sm" href="{% url 'edit' pk=i.id %}">Edit</a> </div>
-                        <div class="col-md-1"> <a class="btn btn-outline-danger btn-sm" href="{% url 'remove' pk=i.id %}">Remove</a> </div>
-                    </div>
-                    <hr>    
-           
-                {% endfor %}
-
+                <div class="col-md-2"> <strong> In/Out </strong> </div>
+                <div class="col-md-2"> <strong> Break </strong>  </div>
+                <div class="col-md-3"> <strong> Hours </strong>  </div>
+                <div class="col-md-3"> </div>
+            </div>
+            <hr> 
+            {% for i in user.shift_set.all %}
                 <div class="row">
-                    <div class="col-md-2"> </div>
-                    <div class="col-md-2"> </div>
-                    <div class="col-md-2"> </div>
-
-                    <div class="col-md-3"> 
-                        <strong>Total: </strong>  {% calc_total_duration user.shift_set.all %}  
-                    </div>
-
-                    <div class="col-md-3"> </div>
+                    <div class="col-md-2"> {{ i.date|date:"d/m/y" }} </div>
+                    <div class="col-md-2"> {{ i.clock_in|date:"H:i" }} - {{ i.clock_out|date:"H:i"}} </div>
+                    <div class="col-md-2"> {{ i.break_time}} </div>
+                    <div class="col-md-3"> {{i.duration}}h </div>
+                    <div class="col-md-1"> <a class="btn btn-outline-info btn-sm" href="{% url 'detail' pk=i.id %}">Detail</a> </div>
+                    <div class="col-md-1"> <a class="btn btn-outline-info btn-sm" href="{% url 'edit' pk=i.id %}">Edit</a> </div>
+                    <div class="col-md-1"> <a class="btn btn-outline-danger btn-sm" href="{% url 'remove' pk=i.id %}">Remove</a> </div>
                 </div>
-                <hr>
-            {% else %}
-            {% endif %}
-            {% endfor %} 
+                <hr>    
         
-        </div>
-    <!-- </div> -->
-</div>
+            {% endfor %}
+
+            <div class="row">
+                <div class="col-md-2"> </div>
+                <div class="col-md-2"> </div>
+                <div class="col-md-2"> </div>
+
+                <div class="col-md-3"> 
+                    <strong>Total: </strong>  {% calc_total_duration user.shift_set.all %}  
+                </div>
+
+                <div class="col-md-3"> </div>
+            </div>
+            <hr>
+        {% else %}
+        {% endif %}
+        {% endfor %} 
+    
+    </div>
+
 
     <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" >
         <div class="modal-dialog">
